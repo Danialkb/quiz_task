@@ -1,0 +1,61 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+ENV/
+venv/
+pip-selfcheck.json
+
+# Distribution / packaging
+dist/
+*.egg-info/
+
+# PyCharm specific
+.idea/
+
+# VSCode specific
+.vscode/
+
+# macOS specific
+.DS_Store
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Test coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# Pyre type checker
+.pyre/
+
+# profiling
+.prof
+
+# Optional Jupyter Notebook
+.ipynb_checkpoints
+
+# Others (optional: if you use SQLite or other dbs/files)
+*.sqlite3
+*.db
+
+# Ignore local dev data
+*.bak
+*.swp

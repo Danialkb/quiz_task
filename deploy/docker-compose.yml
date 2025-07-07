@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  quiz_backend:
+    container_name: quiz_backend
+    restart: always
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    entrypoint: /entrypoint.sh
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../environments/.env
+    depends_on:
+      - quiz_db
+    networks:
+      - quiz_network
+
+  quiz_db:
+    container_name: quiz_db
+    restart: always
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    env_file:
+      - ../environments/.env
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - quiz_network
+
+volumes:
+  pgdata:
+
+networks:
+  quiz_network:
