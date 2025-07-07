@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 
 class SubmitAnswerCommand(UseCase):
     def __init__(
-            self,
-            question_repo: IQuestionRepository,
-            answer_validation_factory: type[IAnswerValidationFactory],
-            quiz_session_updater: QuizSessionProgressUpdater,
-            answer_repo: IUserAnswerRepository,
+        self,
+        question_repo: IQuestionRepository,
+        answer_validation_factory: type[IAnswerValidationFactory],
+        quiz_session_updater: QuizSessionProgressUpdater,
+        answer_repo: IUserAnswerRepository,
     ):
         self.question_repo = question_repo
         self.answer_validation_factory = answer_validation_factory
@@ -29,7 +29,9 @@ class SubmitAnswerCommand(UseCase):
         self.answer_repo = answer_repo
         self._answer_logger = UserAnswerLogger(answer_repo)
 
-    async def execute(self, data: UserAnswerCreateSchema, user_id: UUID) -> UserAnswerCreateResponse:
+    async def execute(
+        self, data: UserAnswerCreateSchema, user_id: UUID
+    ) -> UserAnswerCreateResponse:
         logger.info(f"User<{user_id}> entered {self.__class__.__name__}")
         answer_exists = await self.answer_repo.answer_exists(
             session_id=data.quiz_session_id,
@@ -37,7 +39,9 @@ class SubmitAnswerCommand(UseCase):
             question_id=data.question_id,
         )
 
-        question = await self.question_repo.get_by_id(data.question_id, include_options=True)
+        question = await self.question_repo.get_by_id(
+            data.question_id, include_options=True
+        )
         if answer_exists and question.type != QuestionType.MATCHING:
             raise ServiceException("User already answered")
 

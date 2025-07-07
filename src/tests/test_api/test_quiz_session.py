@@ -15,7 +15,7 @@ async def test_create_quiz_session_success(
     response = await async_client.post(
         ENDPOINT,
         json={"quiz_id": str(test_quiz.id)},
-        headers={"X-User-ID": test_user_id}
+        headers={"X-User-ID": test_user_id},
     )
 
     assert response.status_code == status.HTTP_201_CREATED
@@ -30,9 +30,7 @@ async def test_create_quiz_session_nonexistent_quiz(
     test_user_id,
 ):
     response = await async_client.post(
-        ENDPOINT,
-        json={"quiz_id": str(uuid4())},
-        headers={"X-User-ID": test_user_id}
+        ENDPOINT, json={"quiz_id": str(uuid4())}, headers={"X-User-ID": test_user_id}
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -46,7 +44,7 @@ async def test_create_quiz_session_invalid_user_id(
     response = await async_client.post(
         ENDPOINT,
         json={"quiz_id": str(test_quiz.id)},
-        headers={"X-User-ID": "invalid_id"}
+        headers={"X-User-ID": "invalid_id"},
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -58,11 +56,7 @@ async def test_get_quiz_sessions_empty(
     test_user_id,
 ):
     response = await async_client.get(
-        ENDPOINT,
-        headers={
-            "X-User-ID": test_user_id,
-            "X-Language": "en"
-        }
+        ENDPOINT, headers={"X-User-ID": test_user_id, "X-Language": "en"}
     )
 
     assert response.status_code == status.HTTP_200_OK
@@ -71,16 +65,10 @@ async def test_get_quiz_sessions_empty(
 
 @pytest.mark.asyncio
 async def test_get_quiz_sessions(
-    async_client: AsyncClient,
-    test_quiz_session,
-    test_user_id
+    async_client: AsyncClient, test_quiz_session, test_user_id
 ):
     response = await async_client.get(
-        ENDPOINT,
-        headers={
-            "X-User-ID": test_user_id,
-            "X-Language": "en"
-        }
+        ENDPOINT, headers={"X-User-ID": test_user_id, "X-Language": "en"}
     )
 
     assert response.status_code == status.HTTP_200_OK
@@ -92,13 +80,10 @@ async def test_get_quiz_sessions(
 
 @pytest.mark.asyncio
 async def test_finish_quiz_session_success(
-    async_client: AsyncClient,
-    test_quiz_session,
-    test_user_id
+    async_client: AsyncClient, test_quiz_session, test_user_id
 ):
     response = await async_client.post(
-        f"{ENDPOINT}/{test_quiz_session.id}/finish",
-        headers={"X-User-ID": test_user_id}
+        f"{ENDPOINT}/{test_quiz_session.id}/finish", headers={"X-User-ID": test_user_id}
     )
 
     assert response.status_code == status.HTTP_200_OK
@@ -110,13 +95,9 @@ async def test_finish_quiz_session_success(
 
 
 @pytest.mark.asyncio
-async def test_finish_nonexistent_quiz_session(
-    async_client: AsyncClient,
-    test_user_id
-):
+async def test_finish_nonexistent_quiz_session(async_client: AsyncClient, test_user_id):
     response = await async_client.post(
-        f"{ENDPOINT}/{uuid4()}/finish",
-        headers={"X-User-ID": test_user_id}
+        f"{ENDPOINT}/{uuid4()}/finish", headers={"X-User-ID": test_user_id}
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

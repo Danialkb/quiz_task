@@ -21,4 +21,7 @@ class ListQuizSessionsQuery(UseCase):
             session.quiz.title = session.quiz.translations[0].title
 
         logger.info(f"User<{user_id}> exiting {self.__class__.__name__}")
-        return [QuizSessionResponse.model_validate(quiz_session) for quiz_session in quiz_sessions]
+        return [
+            QuizSessionResponse.model_validate(quiz_session)
+            for quiz_session in quiz_sessions
+        ]

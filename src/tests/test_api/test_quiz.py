@@ -73,8 +73,7 @@ async def test_get_quiz_with_different_language(
         "X-Language": "en",
     }
     en_response = await async_client.get(
-        f"{ENDPOINT}{test_quiz.id}",
-        headers=en_headers
+        f"{ENDPOINT}{test_quiz.id}", headers=en_headers
     )
     assert en_response.json()["title"] == "English Title"
 
@@ -83,7 +82,6 @@ async def test_get_quiz_with_different_language(
         "X-Language": "es",
     }
     ru_response = await async_client.get(
-        f"{ENDPOINT}{test_quiz.id}",
-        headers=ru_headers
+        f"{ENDPOINT}{test_quiz.id}", headers=ru_headers
     )
     assert ru_response.json()["title"] == "Nombre español"

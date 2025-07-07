@@ -17,7 +17,4 @@ class ListQuizzesQuery(UseCase):
         logger.info(f"User<{user_id}> entered {self.__class__.__name__}")
         quiz_list = await self.quiz_repo.get_all(language)
         logger.info(f"User<{user_id}> exiting {self.__class__.__name__}")
-        return [
-            QuizResponse(id=q.id, title=q.translations[0].title)
-            for q in quiz_list
-        ]
+        return [QuizResponse(id=q.id, title=q.translations[0].title) for q in quiz_list]

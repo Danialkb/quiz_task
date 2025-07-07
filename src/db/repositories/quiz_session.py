@@ -22,10 +22,10 @@ class IQuizSessionRepository(ABC):
 
     @abstractmethod
     async def update_progress(
-            self,
-            session_id: UUID,
-            answered_correctly: bool = True,
-            finished_at: datetime | None = None,
+        self,
+        session_id: UUID,
+        answered_correctly: bool = True,
+        finished_at: datetime | None = None,
     ) -> QuizSession | None: ...
 
 
@@ -45,10 +45,7 @@ class QuizSessionRepository(IQuizSessionRepository):
             .join(Quiz.translations)
             .where(QuizSession.user_id == user_id)
             .where(QuizTitleTranslation.language == language)
-            .options(
-                contains_eager(QuizSession.quiz)
-                .contains_eager(Quiz.translations)
-            )
+            .options(contains_eager(QuizSession.quiz).contains_eager(Quiz.translations))
         )
 
         result = await self.session.execute(stmt)

@@ -15,4 +15,3 @@ class QuizSessionProgressUpdater:
             raise NotFoundException("Quiz session not found")
 
         return quiz_session
-

@@ -11,11 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 class CreateQuizSessionCommand(UseCase):
-    def __init__(self, quiz_session_repo: IQuizSessionRepository, quiz_repo: IQuizRepository):
+    def __init__(
+        self, quiz_session_repo: IQuizSessionRepository, quiz_repo: IQuizRepository
+    ):
         self.quiz_session_repo = quiz_session_repo
         self.quiz_repo = quiz_repo
 
-    async def execute(self, quiz_session_data: QuizSessionCreateSchema, user_id: UUID) -> QuizSessionCreateResponse:
+    async def execute(
+        self, quiz_session_data: QuizSessionCreateSchema, user_id: UUID
+    ) -> QuizSessionCreateResponse:
         logger.info(f"User<{user_id}> entered {self.__class__.__name__}")
 
         data = quiz_session_data.model_dump()
@@ -24,7 +28,9 @@ class CreateQuizSessionCommand(UseCase):
             raise NotFoundException(detail="Quiz not found")
 
         data["user_id"] = user_id
-        data["questions_count"] = await self.quiz_repo.get_question_count(quiz_session_data.quiz_id)
+        data["questions_count"] = await self.quiz_repo.get_question_count(
+            quiz_session_data.quiz_id
+        )
         quiz_session = await self.quiz_session_repo.create(data)
 
         logger.info(f"User<{user_id}> exiting {self.__class__.__name__}")

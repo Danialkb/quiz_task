@@ -22,7 +22,9 @@ class Question(UUIDMixin, TimestampMixin, Base):
     )
 
     quiz: Mapped[Quiz] = relationship(back_populates="questions")
-    options: Mapped[list[Option]] = relationship(back_populates="question", cascade="all, delete-orphan")
+    options: Mapped[list[Option]] = relationship(
+        back_populates="question", cascade="all, delete-orphan"
+    )
     translations: Mapped[list["QuestionTranslation"]] = relationship(
         "QuestionTranslation",
         back_populates="question",

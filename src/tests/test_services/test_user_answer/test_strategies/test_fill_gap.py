@@ -12,9 +12,7 @@ class TestFillGapValidation:
     async def test_correct_answer(self, correct_option):
         strategy = FillGapValidation()
         user_answer = UserAnswerCreateSchema(
-            question_id=uuid4(),
-            quiz_session_id=uuid4(),
-            options=[correct_option.id]
+            question_id=uuid4(), quiz_session_id=uuid4(), options=[correct_option.id]
         )
         is_correct, correct_ids = await strategy.validate(user_answer, [correct_option])
         assert is_correct
@@ -24,9 +22,7 @@ class TestFillGapValidation:
     async def test_wrong_answer(self, correct_option, wrong_option):
         strategy = FillGapValidation()
         user_answer = UserAnswerCreateSchema(
-            question_id=uuid4(),
-            quiz_session_id=uuid4(),
-            options=[wrong_option.id]
+            question_id=uuid4(), quiz_session_id=uuid4(), options=[wrong_option.id]
         )
         is_correct, correct_ids = await strategy.validate(user_answer, [correct_option])
         assert not is_correct
@@ -36,9 +32,7 @@ class TestFillGapValidation:
     async def test_invalid_options_count(self):
         strategy = FillGapValidation()
         user_answer = UserAnswerCreateSchema(
-            question_id=uuid4(),
-            quiz_session_id=uuid4(),
-            options=[uuid4(), uuid4()]
+            question_id=uuid4(), quiz_session_id=uuid4(), options=[uuid4(), uuid4()]
         )
         with pytest.raises(ServiceException) as exc:
             await strategy.validate(user_answer, [])

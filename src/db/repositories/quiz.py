@@ -40,8 +40,7 @@ class QuizRepository(IQuizRepository):
         language = kwargs.get("language")
         if language:
             stmt = (
-                stmt
-                .join(Quiz.translations)
+                stmt.join(Quiz.translations)
                 .filter(QuizTitleTranslation.language == language)
                 .options(contains_eager(Quiz.translations))
             )
@@ -50,9 +49,6 @@ class QuizRepository(IQuizRepository):
         return result.unique().scalars().first()
 
     async def get_question_count(self, quiz_id: UUID) -> int:
-        stmt = (
-            select(func.count(Question.id))
-            .where(Question.quiz_id == quiz_id)
-        )
+        stmt = select(func.count(Question.id)).where(Question.quiz_id == quiz_id)
         result = await self.session.execute(stmt)
         return result.scalar_one()

@@ -11,17 +11,23 @@ from db.models import Question, QuestionTranslation, Option, OptionTranslation
 
 class IQuestionRepository(ABC):
     @abstractmethod
-    async def get_by_id(self, instance_id: UUID, include_options: bool = False) -> Question | None: ...
+    async def get_by_id(
+        self, instance_id: UUID, include_options: bool = False
+    ) -> Question | None: ...
 
     @abstractmethod
-    async def get_by_quiz_id(self, quiz_id: UUID, language: str) -> Iterable[Question]: ...
+    async def get_by_quiz_id(
+        self, quiz_id: UUID, language: str
+    ) -> Iterable[Question]: ...
 
 
 class QuestionRepository(IQuestionRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(self, instance_id: UUID, include_options: bool = False) -> Question | None:
+    async def get_by_id(
+        self, instance_id: UUID, include_options: bool = False
+    ) -> Question | None:
         stmt = select(Question).filter(Question.id == instance_id)
 
         if include_options:
@@ -39,7 +45,9 @@ class QuestionRepository(IQuestionRepository):
             .options(
                 contains_eager(Question.translations),
                 selectinload(Question.options).selectinload(Option.translations),
-                with_loader_criteria(OptionTranslation, OptionTranslation.language == language)
+                with_loader_criteria(
+                    OptionTranslation, OptionTranslation.language == language
+                ),
             )
         )
         result = await self.session.execute(stmt)

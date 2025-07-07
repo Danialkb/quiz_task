@@ -14,7 +14,9 @@ class GetQuizQuery(UseCase):
     def __init__(self, quiz_repo: IQuizRepository):
         self.quiz_repo = quiz_repo
 
-    async def execute(self, instance_id: UUID, language: str, user_id: UUID) -> QuizResponse | None:
+    async def execute(
+        self, instance_id: UUID, language: str, user_id: UUID
+    ) -> QuizResponse | None:
         logger.info(f"User<{user_id}> entered {self.__class__.__name__}")
         quiz = await self.quiz_repo.get_by_id(instance_id, language=language)
         logger.info(f"User<{user_id}> exiting {self.__class__.__name__}")

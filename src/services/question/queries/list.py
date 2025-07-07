@@ -13,7 +13,9 @@ class ListQuestionsByQuizQuery(UseCase):
     def __init__(self, question_repo: IQuestionRepository):
         self.question_repo = question_repo
 
-    async def execute(self, quiz_id: UUID, language: str, user_id: UUID) -> list[QuestionResponse]:
+    async def execute(
+        self, quiz_id: UUID, language: str, user_id: UUID
+    ) -> list[QuestionResponse]:
         logger.info(f"User<{user_id}> entered {self.__class__.__name__}")
         questions = await self.question_repo.get_by_quiz_id(quiz_id, language)
         for question in questions:

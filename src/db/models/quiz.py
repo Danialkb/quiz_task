@@ -15,8 +15,12 @@ class Quiz(UUIDMixin, TimestampMixin, Base):
         back_populates="quiz",
         cascade="all, delete-orphan",
     )
-    questions: Mapped[list["Question"]] = relationship("Question", back_populates="quiz", cascade="all, delete-orphan")
-    quiz_sessions: Mapped[list["QuizSession"]] = relationship("QuizSession", back_populates="quiz")
+    questions: Mapped[list["Question"]] = relationship(
+        "Question", back_populates="quiz", cascade="all, delete-orphan"
+    )
+    quiz_sessions: Mapped[list["QuizSession"]] = relationship(
+        "QuizSession", back_populates="quiz"
+    )
 
 
 class QuizTitleTranslation(UUIDMixin, TimestampMixin, Base):

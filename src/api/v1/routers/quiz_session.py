@@ -10,8 +10,12 @@ from db.repositories.quiz import QuizRepository
 from db.repositories.quiz_session import QuizSessionRepository
 from db.repositories.user_answer import UserAnswerRepository
 from db.session import get_session
-from schemas.quiz_session import QuizSessionCreateSchema, QuizSessionCreateResponse, QuizSessionResponse, \
-    QuizSessionFinishedResponse
+from schemas.quiz_session import (
+    QuizSessionCreateSchema,
+    QuizSessionCreateResponse,
+    QuizSessionResponse,
+    QuizSessionFinishedResponse,
+)
 from services.exceptions.not_found import NotFoundException
 from services.quiz_session.commands.create import CreateQuizSessionCommand
 from services.quiz_session.commands.finish import FinishQuizSessionCommand
@@ -31,7 +35,9 @@ async def create_quiz_session(
 ) -> QuizSessionCreateResponse:
     quiz_session_repo = QuizSessionRepository(session)
     quiz_repo = QuizRepository(session)
-    use_case = CreateQuizSessionCommand(quiz_session_repo=quiz_session_repo, quiz_repo=quiz_repo)
+    use_case = CreateQuizSessionCommand(
+        quiz_session_repo=quiz_session_repo, quiz_repo=quiz_repo
+    )
     try:
         return await use_case.execute(data, user_id)
     except NotFoundException as e:
