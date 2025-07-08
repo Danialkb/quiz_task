@@ -1,7 +1,7 @@
 import uuid
 
 from sqlalchemy import Boolean, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from db.models.base import Base
 from db.models.mixins import UUIDMixin, TimestampMixin

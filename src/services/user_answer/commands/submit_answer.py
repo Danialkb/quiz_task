@@ -8,7 +8,7 @@ from schemas.user_answer import UserAnswerCreateSchema, UserAnswerCreateResponse
 from services.base import UseCase
 from services.exceptions.base import ServiceException
 from services.quiz_session.update import QuizSessionProgressUpdater
-from services.user_answer.correct_answer.create import UserAnswerLogger
+from services.user_answer.answer_logger import UserAnswerLogger
 from services.user_answer.strategies.factory import IAnswerValidationFactory
 
 
