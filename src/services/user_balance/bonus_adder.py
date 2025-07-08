@@ -1,7 +1,11 @@
+import logging
 from uuid import UUID
 
 from services.user_balance.calculator import QuizBonusCalculator
 from services.user_balance.external_api import IUserBalanceExternalAPI
+
+
+logger = logging.getLogger(__name__)
 
 
 class BonusAdder:
@@ -20,7 +24,10 @@ class BonusAdder:
         if bonus_amount == 0:
             return 0
 
-        async with self.balance_external_api as balance_api:
-            await balance_api.update_user_balance(user_id, bonus_amount)
+        try:
+            async with self.balance_external_api as balance_api:
+                await balance_api.update_user_balance(user_id, bonus_amount)
+        except Exception as e:
+            logger.error("Error during sending bonus points", str(e),  exc_info=True)
 
         return bonus_amount

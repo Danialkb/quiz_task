@@ -16,6 +16,7 @@ from schemas.quiz_session import (
     QuizSessionResponse,
     QuizSessionFinishedResponse,
 )
+from services.exceptions.base import ServiceException
 from services.exceptions.not_found import NotFoundException
 from services.quiz_session.commands.create import CreateQuizSessionCommand
 from services.quiz_session.commands.finish import FinishQuizSessionCommand
@@ -70,5 +71,5 @@ async def finish_quiz_session(
     use_case = FinishQuizSessionCommand(quiz_session_repo, bonus_adder)
     try:
         return await use_case.execute(session_id, user_id)
-    except NotFoundException as e:
+    except (NotFoundException, ServiceException) as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)

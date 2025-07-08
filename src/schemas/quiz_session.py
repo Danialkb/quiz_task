@@ -20,6 +20,7 @@ class QuizSessionCreateResponse(BaseModel):
 
 
 class QuizSessionResponse(BaseModel):
+    id: UUID
     quiz: QuizResponse
     user_id: UUID
     correct_answers: int
@@ -29,6 +30,13 @@ class QuizSessionResponse(BaseModel):
     score: float = 0
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_serializer("score")
+    def serialize_score(self, value: float) -> float:
+        try:
+            return round(self.correct_answers / self.questions_count, 2) * 100
+        except ZeroDivisionError:
+            return value
 
 
 class QuizSessionFinishedResponse(BaseModel):
@@ -47,6 +55,6 @@ class QuizSessionFinishedResponse(BaseModel):
     @field_serializer("score")
     def serialize_score(self, value: float) -> float:
         try:
-            return round(self.correct_answers / self.questions_count, 2)
+            return round(self.correct_answers / self.questions_count, 2) * 100
         except ZeroDivisionError:
             return value

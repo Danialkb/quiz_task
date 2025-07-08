@@ -13,4 +13,5 @@ class QuizBonusCalculator:
             session_id=quiz_session_id,
             user_id=user_id,
         )
+        print(correct_answers_count, "ADDING")
         return correct_answers_count * self.POINTS_PER_QUESTION
