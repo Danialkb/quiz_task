@@ -71,5 +71,7 @@ async def finish_quiz_session(
     use_case = FinishQuizSessionCommand(quiz_session_repo, bonus_adder)
     try:
         return await use_case.execute(session_id, user_id)
-    except (NotFoundException, ServiceException) as e:
+    except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
+    except ServiceException as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.detail)

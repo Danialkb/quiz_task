@@ -23,4 +23,6 @@ RUN uv sync
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+COPY pytest.ini ./pytest.ini
+
 COPY ./src /src
