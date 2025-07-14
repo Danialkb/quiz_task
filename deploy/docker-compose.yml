@@ -42,8 +42,8 @@ services:
     networks:
       - zimran_network
 
-  taskiq_worker:
-    container_name: taskiq_worker
+  quiz_taskiq_worker:
+    container_name: quiz_taskiq_worker
     build:
       context: ..
       dockerfile: build/Dockerfile
@@ -54,8 +54,8 @@ services:
     networks:
       - zimran_network
 
-  taskiq_scheduler:
-    container_name: taskiq_scheduler
+  quiz_taskiq_scheduler:
+    container_name: quiz_taskiq_scheduler
     build:
       context: ..
       dockerfile: build/Dockerfile
@@ -66,9 +66,43 @@ services:
     networks:
       - zimran_network
 
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/tmp/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - zimran_network
+
+  promtail:
+    image: grafana/promtail:2.9.1
+    container_name: promtail
+    volumes:
+      - ../monitoring/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    networks:
+      - zimran_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - zimran_network
+
 volumes:
   pgdata:
   redis_data:
+  loki_data:
+  grafana_data:
 
 networks:
   zimran_network:
