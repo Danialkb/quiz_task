@@ -32,8 +32,43 @@ services:
     networks:
       - zimran_network
 
+  quiz_redis:
+    container_name: quiz_redis
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/postgresql/data
+    networks:
+      - zimran_network
+
+  taskiq_worker:
+    container_name: taskiq_worker
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    restart: always
+    env_file:
+      - ../environments/.env.local
+    entrypoint: uv run taskiq worker background_tasks.taskiq:broker
+    networks:
+      - zimran_network
+
+  taskiq_scheduler:
+    container_name: taskiq_scheduler
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    restart: always
+    env_file:
+      - ../environments/.env.local
+    entrypoint: uv run taskiq scheduler background_tasks.taskiq:scheduler
+    networks:
+      - zimran_network
+
 volumes:
   pgdata:
+  redis_data:
 
 networks:
   zimran_network:

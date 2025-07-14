@@ -12,10 +12,6 @@ class Option(UUIDMixin, TimestampMixin, Base):
 
     is_correct: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
-    # Denormalization for MATCHING question type
-    is_left: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
-    is_right: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
-
     question_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("questions.id", ondelete="CASCADE"),
         nullable=False,
@@ -43,23 +39,3 @@ class OptionTranslation(UUIDMixin, TimestampMixin, Base):
     )
 
     option: Mapped[Option] = relationship(back_populates="translations")
-
-
-class MatchingOptionCorrectPair(UUIDMixin, TimestampMixin, Base):
-    __tablename__ = "matching_option_correct_pairs"
-
-    question_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("questions.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    left_option_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("options.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    right_option_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("options.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )

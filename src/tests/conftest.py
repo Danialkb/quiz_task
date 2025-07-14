@@ -14,7 +14,6 @@ from db.models import (
     Question,
     QuizTitleTranslation,
     Quiz,
-    MatchingOptionCorrectPair,
     QuizSession,
 )
 from main import app
@@ -97,7 +96,6 @@ async def clean_tables(db_session: AsyncSession):
         QuestionTranslation,
         Question,
         QuizTitleTranslation,
-        MatchingOptionCorrectPair,
         QuizSession,
         Quiz,
     ]

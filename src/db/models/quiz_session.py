@@ -13,6 +13,8 @@ class QuizSession(UUIDMixin, Base):
 
     correct_answers: Mapped[int] = mapped_column(default=0)
     questions_count: Mapped[int]
+    bonus_points: Mapped[int] = mapped_column(default=0)
+    percentile: Mapped[int] = mapped_column(default=0)
 
     user_id: Mapped[uuid.UUID] = mapped_column(index=True)
     quiz_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("quizzes.id"), index=True)
@@ -21,6 +23,6 @@ class QuizSession(UUIDMixin, Base):
         server_default=func.now(),
         nullable=False,
     )
-    finished_at: Mapped[datetime] = mapped_column(nullable=True)
+    finished_at: Mapped[datetime] = mapped_column(nullable=True, index=True)
 
     quiz: Mapped["Quiz"] = relationship("Quiz", back_populates="quiz_sessions")

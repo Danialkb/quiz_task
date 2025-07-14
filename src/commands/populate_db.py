@@ -1,10 +1,11 @@
 import asyncio
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
+from db.models import UserAnswer
 from db.models.quiz import Quiz, QuizTitleTranslation
 from db.models.question import Question, QuestionTranslation
-from db.models.option import Option, OptionTranslation, MatchingOptionCorrectPair
+from db.models.option import Option, OptionTranslation
 from db.session import async_session
 from enums.question_type import QuestionType
 
@@ -13,7 +14,36 @@ def make_translations(model_cls, data: dict[str, str]):
     return [model_cls(language=lang, text=text) for lang, text in data.items()]
 
 
+async def delete_matching_questions_and_answers():
+    async with async_session() as session:
+        matching_questions_stmt = select(Question.id).where(Question.type == "MATCHING")
+        result = await session.execute(matching_questions_stmt)
+        matching_question_ids = [row[0] for row in result.fetchall()]
+
+        if not matching_question_ids:
+            print("No matching questions found.")
+            return
+
+        print(f"Found {len(matching_question_ids)} matching questions.")
+
+        delete_answers_stmt = delete(UserAnswer).where(
+            UserAnswer.question_id.in_(matching_question_ids)
+        )
+        await session.execute(delete_answers_stmt)
+
+        delete_questions_stmt = delete(Question).where(
+            Question.id.in_(matching_question_ids)
+        )
+        await session.execute(delete_questions_stmt)
+
+        await session.commit()
+        print(
+            f"Deleted {len(matching_question_ids)} matching questions and their answers."
+        )
+
+
 async def seed_quiz():
+    await delete_matching_questions_and_answers()
     async with async_session() as session:
         stmt = select(QuizTitleTranslation).filter(
             QuizTitleTranslation.title == "General Knowledge Quiz"
@@ -175,147 +205,10 @@ async def seed_quiz():
         )
 
         # --- MATCHING ---
-        matching_q = Question(
-            type=QuestionType.MATCHING,
-            translations=make_translations(
-                QuestionTranslation,
-                {
-                    "en": "Match the animals with their habitats",
-                    "es": "Relaciona los animales con sus hábitats",
-                },
-            ),
-        )
-        left_options = [
-            Option(
-                is_left=True,
-                is_right=False,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Camel",
-                        "es": "Camello",
-                    },
-                ),
-            ),
-            Option(
-                is_left=True,
-                is_right=False,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Penguin",
-                        "es": "Pingüino",
-                    },
-                ),
-            ),
-            Option(
-                is_left=True,
-                is_right=False,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Frog",
-                        "es": "Rana",
-                    },
-                ),
-            ),
-            Option(
-                is_left=True,
-                is_right=False,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Eagle",
-                        "es": "Águila",
-                    },
-                ),
-            ),
-        ]
 
-        right_options = [
-            Option(
-                is_left=False,
-                is_right=True,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Desert",
-                        "es": "Desierto",
-                    },
-                ),
-            ),
-            Option(
-                is_left=False,
-                is_right=True,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Antarctica",
-                        "es": "Antártida",
-                    },
-                ),
-            ),
-            Option(
-                is_left=False,
-                is_right=True,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Swamp",
-                        "es": "Pantano",
-                    },
-                ),
-            ),
-            Option(
-                is_left=False,
-                is_right=True,
-                is_correct=False,
-                translations=make_translations(
-                    OptionTranslation,
-                    {
-                        "en": "Mountains",
-                        "es": "Montañas",
-                    },
-                ),
-            ),
-        ]
-
-        matching_q.options.extend(left_options + right_options)
-
-        quiz.questions.extend([single_choice_q, multi_choice_q, fill_gap_q, matching_q])
+        quiz.questions.extend([single_choice_q, multi_choice_q, fill_gap_q])
         session.add(quiz)
         await session.flush()
-
-        correct_matching_pairs = [
-            MatchingOptionCorrectPair(
-                left_option_id=left_options[0].id,  # Camel
-                right_option_id=right_options[0].id,  # Desert
-                question_id=matching_q.id,
-            ),
-            MatchingOptionCorrectPair(
-                left_option_id=left_options[1].id,  # Penguin
-                right_option_id=right_options[1].id,  # Antarctica
-                question_id=matching_q.id,
-            ),
-            MatchingOptionCorrectPair(
-                left_option_id=left_options[2].id,  # Frog
-                right_option_id=right_options[2].id,  # Swamp
-                question_id=matching_q.id,
-            ),
-            MatchingOptionCorrectPair(
-                left_option_id=left_options[3].id,  # Eagle
-                right_option_id=right_options[3].id,  # Mountains
-                question_id=matching_q.id,
-            ),
-        ]
-        session.add_all(correct_matching_pairs)
         await session.commit()
 
         print("DB populated successfully")

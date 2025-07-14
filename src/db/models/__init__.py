@@ -1,8 +1,9 @@
 from .quiz import Quiz, QuizTitleTranslation
 from .question import Question, QuestionTranslation
-from .option import Option, OptionTranslation, MatchingOptionCorrectPair
+from .option import Option, OptionTranslation
 from .quiz_session import QuizSession
 from .user_answer import UserAnswer
+from .outbox_message import OutboxMessage
 
 __all__ = [
     "Quiz",
@@ -11,7 +12,7 @@ __all__ = [
     "QuestionTranslation",
     "Option",
     "OptionTranslation",
-    "MatchingOptionCorrectPair",
     "QuizSession",
     "UserAnswer",
+    "OutboxMessage",
 ]

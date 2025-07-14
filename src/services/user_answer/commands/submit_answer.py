@@ -33,16 +33,16 @@ class SubmitAnswerCommand(UseCase):
         self, data: UserAnswerCreateSchema, user_id: UUID
     ) -> UserAnswerCreateResponse:
         logger.info(f"User<{user_id}> entered {self.__class__.__name__}")
+
+        question = await self.question_repo.get_by_id(
+            data.question_id, include_options=True
+        )
         answer_exists = await self.answer_repo.answer_exists(
             session_id=data.quiz_session_id,
             user_id=user_id,
             question_id=data.question_id,
         )
-
-        question = await self.question_repo.get_by_id(
-            data.question_id, include_options=True
-        )
-        if answer_exists and question.type != QuestionType.MATCHING:
+        if answer_exists:
             raise ServiceException("User already answered")
 
         try:
@@ -51,14 +51,15 @@ class SubmitAnswerCommand(UseCase):
             raise ServiceException(detail="Unknown question type")
 
         is_correct, correct_options = await strategy.validate(data, question.options)
-        if is_correct:
-            await self.quiz_session_updater.update_progress(data.quiz_session_id)
         await self._answer_logger.log_answer(
             quiz_session_id=data.quiz_session_id,
             question_id=question.id,
             user_id=user_id,
             is_correct=is_correct,
         )
+
+        if is_correct:
+            await self.quiz_session_updater.update_progress(data.quiz_session_id)
 
         logger.info(f"User<{user_id}> exiting {self.__class__.__name__}")
         return UserAnswerCreateResponse(

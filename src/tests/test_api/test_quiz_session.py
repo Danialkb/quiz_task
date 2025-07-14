@@ -6,7 +6,6 @@ from fastapi import status
 ENDPOINT = "/api/v1/quiz_sessions"
 
 
-@pytest.mark.asyncio
 async def test_create_quiz_session_success(
     async_client: AsyncClient,
     test_quiz,
@@ -24,7 +23,6 @@ async def test_create_quiz_session_success(
     assert data["user_id"] == test_user_id
 
 
-@pytest.mark.asyncio
 async def test_create_quiz_session_nonexistent_quiz(
     async_client: AsyncClient,
     test_user_id,
@@ -36,7 +34,6 @@ async def test_create_quiz_session_nonexistent_quiz(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_create_quiz_session_invalid_user_id(
     async_client: AsyncClient,
     test_quiz,
@@ -47,10 +44,9 @@ async def test_create_quiz_session_invalid_user_id(
         headers={"X-User-ID": "invalid_id"},
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_get_quiz_sessions_empty(
     async_client: AsyncClient,
     test_user_id,
@@ -63,7 +59,6 @@ async def test_get_quiz_sessions_empty(
     assert response.json() == []
 
 
-@pytest.mark.asyncio
 async def test_get_quiz_sessions(
     async_client: AsyncClient, test_quiz_session, test_user_id
 ):
@@ -78,7 +73,6 @@ async def test_get_quiz_sessions(
     assert data[0]["finished_at"] is None
 
 
-@pytest.mark.asyncio
 async def test_finish_quiz_session_success(
     async_client: AsyncClient, test_quiz_session, test_user_id
 ):
@@ -92,9 +86,9 @@ async def test_finish_quiz_session_success(
     assert data["user_id"] == test_user_id
     assert data["quiz_id"] == str(test_quiz_session.quiz_id)
     assert data["finished_at"] is not None
+    assert data["percentile"] == 100
 
 
-@pytest.mark.asyncio
 async def test_finish_nonexistent_quiz_session(async_client: AsyncClient, test_user_id):
     response = await async_client.post(
         f"{ENDPOINT}/{uuid4()}/finish", headers={"X-User-ID": test_user_id}

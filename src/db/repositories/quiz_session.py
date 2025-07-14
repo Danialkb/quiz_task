@@ -12,13 +12,16 @@ from db.models import QuizSession, Quiz, QuizTitleTranslation
 
 class IQuizSessionRepository(ABC):
     @abstractmethod
-    async def get_by_id(self, instance_id: UUID) -> QuizSession | None: ...
+    async def get_by_id(self, instance_id: UUID) -> QuizSession | None:
+        ...
 
     @abstractmethod
-    async def get_all(self, user_id: UUID, language: str) -> Iterable[QuizSession]: ...
+    async def get_all(self, user_id: UUID, language: str) -> Iterable[QuizSession]:
+        ...
 
     @abstractmethod
-    async def create(self, data: dict) -> QuizSession: ...
+    async def create(self, data: dict) -> QuizSession:
+        ...
 
     @abstractmethod
     async def update_progress(
@@ -26,7 +29,10 @@ class IQuizSessionRepository(ABC):
         session_id: UUID,
         answered_correctly: bool = True,
         finished_at: datetime | None = None,
-    ) -> QuizSession | None: ...
+        bonus_points: int = 0,
+        percentile: float = 0,
+    ) -> QuizSession | None:
+        ...
 
 
 class QuizSessionRepository(IQuizSessionRepository):
@@ -63,6 +69,8 @@ class QuizSessionRepository(IQuizSessionRepository):
         session_id: UUID,
         answered_correctly: bool = True,
         finished_at: datetime | None = None,
+        bonus_points: int = 0,
+        percentile: float = 0,
     ) -> QuizSession | None:
         stmt = select(QuizSession).filter(QuizSession.id == session_id)
         result = await self.session.execute(stmt)
@@ -76,6 +84,8 @@ class QuizSessionRepository(IQuizSessionRepository):
 
         if finished_at:
             quiz_session.finished_at = finished_at
+            quiz_session.bonus_points = bonus_points
+            quiz_session.percentile = percentile
 
         await self.session.commit()
         await self.session.refresh(quiz_session)

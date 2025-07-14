@@ -7,7 +7,6 @@ from services.user_answer.strategies.multi_choice import MultiChoiceValidation
 
 
 class TestMultiChoiceValidation:
-    @pytest.mark.asyncio
     async def test_correct_answer(self, correct_option, wrong_option):
         strategy = MultiChoiceValidation()
         user_answer = UserAnswerCreateSchema(
@@ -19,7 +18,6 @@ class TestMultiChoiceValidation:
         assert is_correct
         assert correct_ids == [correct_option.id]
 
-    @pytest.mark.asyncio
     async def test_partial_answer(self, correct_option, wrong_option):
         strategy = MultiChoiceValidation()
         user_answer = UserAnswerCreateSchema(

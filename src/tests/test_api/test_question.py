@@ -1,4 +1,3 @@
-import pytest
 from uuid import uuid4
 from httpx import AsyncClient
 from fastapi import status
@@ -8,7 +7,6 @@ from enums.question_type import QuestionType
 ENDPOINT = "/api/v1/quizzes/{quiz_id}/questions"
 
 
-@pytest.mark.asyncio
 async def test_get_questions_empty_quiz(async_client: AsyncClient, test_quiz):
     response = await async_client.get(
         ENDPOINT.format(quiz_id=test_quiz.id),
@@ -22,7 +20,6 @@ async def test_get_questions_empty_quiz(async_client: AsyncClient, test_quiz):
     assert response.json() == []
 
 
-@pytest.mark.asyncio
 async def test_get_questions_with_one_question(
     async_client: AsyncClient, test_question
 ):
@@ -42,7 +39,6 @@ async def test_get_questions_with_one_question(
     assert data[0]["options"] == []
 
 
-@pytest.mark.asyncio
 async def test_get_questions_with_options(
     async_client: AsyncClient, test_question_with_options
 ):
@@ -67,7 +63,6 @@ async def test_get_questions_with_options(
     }
 
 
-@pytest.mark.asyncio
 async def test_get_questions_multilang(
     async_client: AsyncClient, test_question_with_multilang
 ):
@@ -94,7 +89,6 @@ async def test_get_questions_multilang(
     assert es_data[0]["options"][0]["text"] == "Opción en español"
 
 
-@pytest.mark.asyncio
 async def test_get_questions_nonexistent_quiz(async_client: AsyncClient):
     response = await async_client.get(
         ENDPOINT.format(quiz_id=uuid4()),
@@ -108,7 +102,6 @@ async def test_get_questions_nonexistent_quiz(async_client: AsyncClient):
     assert response.json() == []
 
 
-@pytest.mark.asyncio
 async def test_get_questions_invalid_user_id(async_client: AsyncClient, test_quiz):
     response = await async_client.get(
         ENDPOINT.format(quiz_id=test_quiz.id),
@@ -118,4 +111,4 @@ async def test_get_questions_invalid_user_id(async_client: AsyncClient, test_qui
         },
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

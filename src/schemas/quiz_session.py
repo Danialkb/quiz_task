@@ -49,6 +49,7 @@ class QuizSessionFinishedResponse(BaseModel):
     finished_at: datetime
     score: float = 0
     bonus_points: int = 0
+    percentile: int = 0
 
     model_config = ConfigDict(from_attributes=True)
 

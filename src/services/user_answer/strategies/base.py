@@ -9,4 +9,5 @@ class AnswerValidationStrategy(ABC):
     @abstractmethod
     async def validate(
         self, user_answer: UserAnswerCreateSchema, options: list[Option]
-    ) -> tuple[bool, list[UUID]]: ...
+    ) -> tuple[bool, list[UUID]]:
+        ...

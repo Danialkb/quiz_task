@@ -8,7 +8,6 @@ from services.user_answer.strategies.fill_gap import FillGapValidation
 
 
 class TestFillGapValidation:
-    @pytest.mark.asyncio
     async def test_correct_answer(self, correct_option):
         strategy = FillGapValidation()
         user_answer = UserAnswerCreateSchema(
@@ -18,7 +17,6 @@ class TestFillGapValidation:
         assert is_correct
         assert correct_ids == [correct_option.id]
 
-    @pytest.mark.asyncio
     async def test_wrong_answer(self, correct_option, wrong_option):
         strategy = FillGapValidation()
         user_answer = UserAnswerCreateSchema(
@@ -28,7 +26,6 @@ class TestFillGapValidation:
         assert not is_correct
         assert correct_ids == [correct_option.id]
 
-    @pytest.mark.asyncio
     async def test_invalid_options_count(self):
         strategy = FillGapValidation()
         user_answer = UserAnswerCreateSchema(

@@ -24,7 +24,18 @@ class Settings(ConfigBase):
 
     ALLOWED_ORIGINS: list[str] = ["*"]
 
-    BALANCE_SERVICE_URL: str
+    # Rabbit
+    RABBITMQ_URL: str
+    BALANCE_EXCHANGE: str
+    BALANCE_QUEUE: str
+    BALANCE_EXCHANGE_TYPE: str
+    BALANCE_ROUTING_KEY: str
+
+    # Redis
+    REDIS_HOST: str
+    REDIS_PORT: str
+    CACHE_REDIS_TABLE: int
+    TASKIQ_REDIS_TABLE: int
 
 
 settings = Settings()

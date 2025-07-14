@@ -1,8 +1,13 @@
 import logging
 from uuid import UUID
 
+from db.repositories.outbox_message import IOutboxMessageRepository
+from enums.balance_update_type import BalanceUpdateType
+from enums.outbox_event import OutboxEvent
+from messaging.producers.base import Producer
+from messaging.producers.exceptions import ProducerException
+from messaging.producers.messages import BalanceUpdateMessage
 from services.user_balance.calculator import QuizBonusCalculator
-from services.user_balance.external_api import IUserBalanceExternalAPI
 
 
 logger = logging.getLogger(__name__)
@@ -12,10 +17,12 @@ class BonusAdder:
     def __init__(
         self,
         bonus_calculator: QuizBonusCalculator,
-        balance_external_api: IUserBalanceExternalAPI,
+        balance_update_producer: Producer,
+        outbox_repo: IOutboxMessageRepository,
     ):
         self.bonus_calculator = bonus_calculator
-        self.balance_external_api = balance_external_api
+        self.balance_update_producer = balance_update_producer
+        self.outbox_repo = outbox_repo
 
     async def add_bonus_points(self, quiz_session_id: UUID, user_id: UUID) -> int:
         bonus_amount = await self.bonus_calculator.calculate_bonus(
@@ -24,10 +31,18 @@ class BonusAdder:
         if bonus_amount == 0:
             return 0
 
+        message = BalanceUpdateMessage(
+            user_id=user_id,
+            amount=bonus_amount,
+            type=BalanceUpdateType.QUIZ_REWARD,
+        )
         try:
-            async with self.balance_external_api as balance_api:
-                await balance_api.update_user_balance(user_id, bonus_amount)
-        except Exception as e:
-            logger.error("Error during sending bonus points", str(e),  exc_info=True)
+            await self.balance_update_producer.publish(message)
+        except ProducerException as e:
+            logger.error("Error during sending bonus points", str(e), exc_info=True)
+            await self.outbox_repo.create(
+                event_type=OutboxEvent.BALANCE_UPDATE,
+                payload=message.model_dump(mode="json"),
+            )
 
         return bonus_amount

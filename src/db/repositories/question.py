@@ -13,12 +13,12 @@ class IQuestionRepository(ABC):
     @abstractmethod
     async def get_by_id(
         self, instance_id: UUID, include_options: bool = False
-    ) -> Question | None: ...
+    ) -> Question | None:
+        ...
 
     @abstractmethod
-    async def get_by_quiz_id(
-        self, quiz_id: UUID, language: str
-    ) -> Iterable[Question]: ...
+    async def get_by_quiz_id(self, quiz_id: UUID, language: str) -> Iterable[Question]:
+        ...
 
 
 class QuestionRepository(IQuestionRepository):

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class UseCase(ABC):
+class Producer(ABC):
     @abstractmethod
-    async def execute(self, *args, **kwargs):
+    async def publish(self, *args, **kwargs):
         ...

@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime
 from uuid import UUID
@@ -6,8 +5,8 @@ from uuid import UUID
 from db.repositories.quiz_session import IQuizSessionRepository
 from schemas.quiz_session import QuizSessionFinishedResponse
 from services.base import UseCase
-from services.exceptions.base import ServiceException
 from services.exceptions.not_found import NotFoundException
+from services.quiz.statistics import QuizStatsService
 from services.user_balance.bonus_adder import BonusAdder
 
 logger = logging.getLogger(__name__)
@@ -18,9 +17,11 @@ class FinishQuizSessionCommand(UseCase):
         self,
         quiz_session_repo: IQuizSessionRepository,
         bonus_adder: BonusAdder,
+        quiz_stats_service: QuizStatsService,
     ):
         self.quiz_session_repo = quiz_session_repo
         self.bonus_adder = bonus_adder
+        self.quiz_stats_service = quiz_stats_service
 
     async def execute(
         self, quiz_session_id: UUID, user_id: UUID
@@ -31,18 +32,24 @@ class FinishQuizSessionCommand(UseCase):
         quiz_session = await self.quiz_session_repo.get_by_id(quiz_session_id)
         if not quiz_session:
             raise NotFoundException("Quiz session not found")
-        if quiz_session.finished_at is not None:
-            raise ServiceException("Quiz already finished")
+        # if quiz_session.finished_at is not None:
+        #     raise ServiceException("Quiz already finished")
 
+        bonus_points = await self.bonus_adder.add_bonus_points(
+            quiz_session_id,
+            user_id,
+        )
+        percentile = await self.quiz_stats_service.get_user_percentile(
+            quiz_id=quiz_session.quiz_id,
+            user_score=(quiz_session.correct_answers / quiz_session.questions_count)
+            * 100,
+        )
         quiz_session = await self.quiz_session_repo.update_progress(
             quiz_session_id,
             answered_correctly=False,
             finished_at=now,
-        )
-
-        # set up bonus adding to the background
-        quiz_session.bonus_points = await self.bonus_adder.add_bonus_points(
-            quiz_session_id, user_id
+            bonus_points=bonus_points,
+            percentile=percentile,
         )
 
         logger.info(f"User<{user_id}> exiting {self.__class__.__name__}")

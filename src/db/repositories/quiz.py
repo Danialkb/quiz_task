@@ -12,13 +12,16 @@ from db.models.quiz import Quiz, QuizTitleTranslation
 
 class IQuizRepository(ABC):
     @abstractmethod
-    async def get_all(self, language: str) -> Iterable[Quiz]: ...
+    async def get_all(self, language: str) -> Iterable[Quiz]:
+        ...
 
     @abstractmethod
-    async def get_by_id(self, instance_id: UUID, **kwargs) -> Quiz | None: ...
+    async def get_by_id(self, instance_id: UUID, **kwargs) -> Quiz | None:
+        ...
 
     @abstractmethod
-    async def get_question_count(self, quiz_id: UUID) -> int: ...
+    async def get_question_count(self, quiz_id: UUID) -> int:
+        ...
 
 
 class QuizRepository(IQuizRepository):
